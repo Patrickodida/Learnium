@@ -28,6 +28,7 @@ const Signup = () => {
           placeholder="Full Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          autoComplete="username"
           required
         />
         <input
@@ -36,6 +37,7 @@ const Signup = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type="email"
+          autoComplete="email"
           required
         />
         <input
@@ -44,6 +46,7 @@ const Signup = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           type="password"
+          autoComplete="current-password"
           required
         />
         <button

@@ -21,8 +21,10 @@ export async function markLessonCompleted(userId, courseId, lessonId) {
   return data;
 }
 
+// fetch completed lessons for a user in a specific course
 export const getCompletedLessons = async (userId, courseId) => {
+  // GET /api/enroll/:userId/:courseId/completed
   const res = await api.get(`/api/enroll/${userId}/${courseId}/completed`);
-  return res.data.completedLessonIds; // array of lesson IDs
+  // Return array of completed lesson IDs
+  return res.data.completedLessonIds;
 };
-

@@ -20,23 +20,32 @@ export default function LessonView() {
 
   useEffect(() => {
     (async () => {
-      const ls = await getLesson(id);
-      setLesson(ls);
-      const c = await getCourseById(ls.courseId);
-      setCourse(c);
+      try {
+        const ls = await getLesson(id);
+        setLesson(ls);
+        const c = await getCourseById(ls.courseId);
+        setCourse(c);
 
-      // Fetch completed lessons for this user & course
-      if (user) {
-        try {
-          const completed = await getCompletedLessons(user.id, ls.courseId);
-          setCompletedLessons(completed.completedLessonIds); // array of lesson IDs from backend
-        } catch (err) {
-          console.error("Failed to fetch completed lessons:", err);
+        // Fetch completed lessons for this user & course
+        if (user) {
+          try {
+            const completed = await getCompletedLessons(user.id, ls.courseId);
+            // Ensure we always set an array even if backend returns undefined
+            setCompletedLessons(completed?.completedLessonIds || []);
+          } catch (err) {
+            console.error("Failed to fetch completed lessons:", err);
+            setCompletedLessons([]); // fallback on error
+          }
         }
+      } catch (err) {
+        console.error("Failed to load lesson or course:", err);
+        // redirect or show error message if lesson/course fails
+        navigate("/courses");
       }
     })();
-  }, [id, user]);
+  }, [id, user, navigate]); // Added navigate as dependency
 
+  // Guard access to course content
   const canAccess = useMemo(() => {
     if (!course) return false;
     if (course.price === 0) return true;
@@ -67,12 +76,13 @@ export default function LessonView() {
     );
   }
 
-  // Handle marking lesson as complete (updates backend + UI)
+  // Handle marking lesson as complete safely
   const handleMarkComplete = async () => {
     if (!user) return;
     try {
       await markLessonCompleted(user.id, course.id, lesson.id);
-      setCompletedLessons((prev) => [...prev, lesson.id]); // Update local state
+      // Update local state safely
+      setCompletedLessons((prev) => [...(prev || []), lesson.id]);
     } catch (err) {
       console.error(err);
       alert("Could not mark lesson as complete.");
@@ -95,22 +105,22 @@ export default function LessonView() {
       </div>
       <div
         className={`mt-4 p-4 border rounded ${
-          // Visual change for completed lesson
-          completedLessons.includes(lesson.id)
+          // Safe includes check to prevent crash
+          (completedLessons || []).includes(lesson.id)
             ? "bg-green-100 border-green-500"
             : "bg-white"
         }`}
       >
         <button
           onClick={handleMarkComplete}
-          disabled={completedLessons.includes(lesson.id)} // disable if completed
+          disabled={(completedLessons || []).includes(lesson.id)} // Safe check
           className={`px-4 py-2 rounded ${
             completedLessons.includes(lesson.id)
               ? "bg-gray-400 text-white"
               : "bg-green-600 text-white hover:bg-green-700"
           }`}
         >
-          {completedLessons.includes(lesson.id) ? "Completed" : "Mark Complete"} {/* Label change */}
+          {(completedLessons || []).includes(lesson.id) ? "Completed" : "Mark Complete"} {/* Safe check */}
         </button>
       </div>
     </div>

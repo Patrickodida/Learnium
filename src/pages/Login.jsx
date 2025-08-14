@@ -27,6 +27,7 @@ const Login = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type="email"
+          autoComplete="email"
           required
         />
         <input
@@ -35,6 +36,7 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           type="password"
+          autoComplete="current-password"
           required
         />
         <button

@@ -23,7 +23,7 @@ const PaymentButton = ({ amount, currency = "UGX", courseId }) => {
     >
       {loading
         ? "Starting..."
-        : `Buy Now . ${amount.toLocalString()} ${currency}`}
+        : `Buy Now . ${amount.toLocaleString()} ${currency}`}
     </button>
   );
 };

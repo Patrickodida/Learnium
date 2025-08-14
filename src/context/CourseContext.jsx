@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import * as coursesApi from "../services/courseService";
-import * as enrollmentApi from "../services/enrollmentService";
+import * as coursesApi from "../services/courseService"; // fixed import
+import * as enrollmentApi from "../services/enrollmentService"; // fixed import
 import { AuthContext } from "./AuthContext";
 
 export const CourseContext = createContext();
 
-export const CourseProvider = ({ children }) => {
+export function CourseProvider({ children }) {
   const [courses, setCourses] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const { user } = useContext(AuthContext);
