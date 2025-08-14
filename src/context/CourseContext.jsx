@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import * as coursesApi from "../services/courseService"; // fixed import
-import * as enrollmentApi from "../services/enrollmentService"; // fixed import
+import * as coursesApi from "../services/courseService";
+import * as enrollmentApi from "../services/enrollmentService";
 import { AuthContext } from "./AuthContext";
 
 export const CourseContext = createContext();
 
-export function CourseProvider({ children }) {
+export default function CourseProvider({ children }) {
   const [courses, setCourses] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const { user } = useContext(AuthContext);
@@ -27,7 +27,6 @@ export function CourseProvider({ children }) {
 
   useEffect(() => {
     loadMyEnrollments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const isEnrolled = (courseId) =>
