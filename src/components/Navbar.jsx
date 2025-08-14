@@ -26,6 +26,19 @@ const Navbar = () => {
           </Link>
           {user ? (
             <>
+              {/* Role-based links */}
+              {user.role === "ADMIN" && (
+                <Link to="/admin" className="hover:text-blue-600">
+                  Admin Panel
+                </Link>
+              )}
+
+              {user.role === "INSTRUCTOR" && (
+                <Link to="/instructor/courses" className="hover:text-blue-600">
+                  My Courses
+                </Link>
+              )}
+
               <Link to="/dashboard" className="hover:text-blue-600">
                 Dashboard
               </Link>

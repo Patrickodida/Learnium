@@ -4,6 +4,7 @@ import { getLesson } from "../services/lessonService";
 import { CourseContext } from "../context/CourseContext";
 import { AuthContext } from "../context/AuthContext";
 import { getCourseById } from "../services/courseService";
+import { markLessonCompleted } from "../services/enrollmentService";
 
 export default function LessonView() {
   const { id } = useParams();
@@ -29,16 +30,22 @@ export default function LessonView() {
     return user && isEnrolled(course.id);
   }, [course, user, isEnrolled]);
 
-  if (!lesson || !course) return <div className="max-w-4xl mx-auto px-4 py-10">Loading...</div>;
+  if (!lesson || !course)
+    return <div className="max-w-4xl mx-auto px-4 py-10">Loading...</div>;
 
   if (!canAccess) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-10">
         <div className="border rounded p-6 bg-yellow-50">
           <h1 className="text-xl font-semibold">This lesson is locked</h1>
-          <p className="text-sm text-gray-700 mt-2">Please enroll or purchase the course to access this content.</p>
+          <p className="text-sm text-gray-700 mt-2">
+            Please enroll or purchase the course to access this content.
+          </p>
           <div className="mt-4">
-            <button onClick={() => navigate(`/courses/${course.id}`)} className="px-4 py-2 bg-blue-600 text-white rounded">
+            <button
+              onClick={() => navigate(`/courses/${course.id}`)}
+              className="px-4 py-2 bg-blue-600 text-white rounded"
+            >
               Go to Course
             </button>
           </div>
@@ -47,9 +54,23 @@ export default function LessonView() {
     );
   }
 
+  // Function to handle marking complete
+  const handleMarkComplete = async () => {
+    if (!user) return;
+    try {
+      await markLessonCompleted(user.id, course.id, lesson.id);
+      alert("Lesson marked as completed!");
+    } catch (err) {
+      console.error(err);
+      alert("Could not mark lesson as complete.");
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
-      <Link to={`/courses/${course.id}`} className="text-blue-600">&larr; Back to course</Link>
+      <Link to={`/courses/${course.id}`} className="text-blue-600">
+        &larr; Back to course
+      </Link>
       <h1 className="text-2xl font-bold mt-4">{lesson.title}</h1>
       <div className="aspect-video mt-4">
         <iframe
@@ -58,6 +79,14 @@ export default function LessonView() {
           className="w-full h-full rounded"
           allowFullScreen
         />
+      </div>
+      <div className="mt-4">
+        <button
+          onClick={handleMarkComplete}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          Mark Complete
+        </button>
       </div>
     </div>
   );
