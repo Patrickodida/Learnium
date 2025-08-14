@@ -1,10 +1,10 @@
 import { useEffect, useState, useContext, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getLesson } from "../services/lessonService";
+import { getCourseById } from "../services/courseService";
+import { markLessonCompleted, getCompletedLessons } from "../services/enrollmentService";
 import { CourseContext } from "../context/CourseContext";
 import { AuthContext } from "../context/AuthContext";
-import { getCourseById } from "../services/courseService";
-import { markLessonCompleted } from "../services/enrollmentService";
 
 export default function LessonView() {
   const { id } = useParams();
@@ -15,14 +15,27 @@ export default function LessonView() {
   const [lesson, setLesson] = useState(null);
   const [course, setCourse] = useState(null);
 
+  // Persistent completed lessons state
+  const [completedLessons, setCompletedLessons] = useState([]);
+
   useEffect(() => {
     (async () => {
       const ls = await getLesson(id);
       setLesson(ls);
       const c = await getCourseById(ls.courseId);
       setCourse(c);
+
+      // Fetch completed lessons for this user & course
+      if (user) {
+        try {
+          const completed = await getCompletedLessons(user.id, ls.courseId);
+          setCompletedLessons(completed.completedLessonIds); // array of lesson IDs from backend
+        } catch (err) {
+          console.error("Failed to fetch completed lessons:", err);
+        }
+      }
     })();
-  }, [id]);
+  }, [id, user]);
 
   const canAccess = useMemo(() => {
     if (!course) return false;
@@ -54,12 +67,12 @@ export default function LessonView() {
     );
   }
 
-  // Function to handle marking complete
+  // Handle marking lesson as complete (updates backend + UI)
   const handleMarkComplete = async () => {
     if (!user) return;
     try {
       await markLessonCompleted(user.id, course.id, lesson.id);
-      alert("Lesson marked as completed!");
+      setCompletedLessons((prev) => [...prev, lesson.id]); // Update local state
     } catch (err) {
       console.error(err);
       alert("Could not mark lesson as complete.");
@@ -80,12 +93,24 @@ export default function LessonView() {
           allowFullScreen
         />
       </div>
-      <div className="mt-4">
+      <div
+        className={`mt-4 p-4 border rounded ${
+          // Visual change for completed lesson
+          completedLessons.includes(lesson.id)
+            ? "bg-green-100 border-green-500"
+            : "bg-white"
+        }`}
+      >
         <button
           onClick={handleMarkComplete}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          disabled={completedLessons.includes(lesson.id)} // disable if completed
+          className={`px-4 py-2 rounded ${
+            completedLessons.includes(lesson.id)
+              ? "bg-gray-400 text-white"
+              : "bg-green-600 text-white hover:bg-green-700"
+          }`}
         >
-          Mark Complete
+          {completedLessons.includes(lesson.id) ? "Completed" : "Mark Complete"} {/* Label change */}
         </button>
       </div>
     </div>

@@ -20,3 +20,9 @@ export async function markLessonCompleted(userId, courseId, lessonId) {
   const { data } = await api.put(`/api/enroll/${userId}/${courseId}/complete`, { lessonId });
   return data;
 }
+
+export const getCompletedLessons = async (userId, courseId) => {
+  const res = await api.get(`/api/enroll/${userId}/${courseId}/completed`);
+  return res.data.completedLessonIds; // array of lesson IDs
+};
+
