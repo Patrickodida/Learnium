@@ -1,10 +1,65 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
 
 const Signup = () => {
-    return (
-        <div>
-            <h2 className="text-4xl text-blue-400">Signup page</h2>
-        </div>
-    )
-}
+  const { signup, loading } = useContext(AuthContext);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const submit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const ok = await signup(name, email, password);
+      if (ok) navigate("/login");
+    } catch (err) {
+      alert(err?.response?.data?.error || "Signup failed");
+    }
+  };
+  return (
+    <div className="max-w-md mx-auto px-4 py-12">
+      <h1 className="text-2xl font-bold mb-6">Create account</h1>
+      <form onSubmit={submit} className="space-y-4">
+        <input
+          className="w-full border rounded px-3 py-2"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          className="w-full border rounded px-3 py-2"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          required
+        />
+        <input
+          className="w-full border rounded px-3 py-2"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
+          required
+        />
+        <button
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-60"
+        >
+          {loading ? "Please wait..." : "Sign Up"}
+        </button>
+      </form>
+      <p className="text-sm mt-4">
+        Already have an account?{" "}
+        <Link to="/login" className="text-blue-600">
+          Login
+        </Link>
+      </p>
+    </div>
+  );
+};
 export default Signup;
