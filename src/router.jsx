@@ -6,8 +6,10 @@ import Courses from "./pages/Courses";
 import CourseDetails from "./pages/CourseDetails";
 import LessonView from "./pages/LessonView";
 import Dashboard from "./pages/Dashboard";
+import InstructorDashboard from "./pages/InstructorDashboard";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function AppRouter() {
   return (
@@ -21,7 +23,25 @@ export default function AppRouter() {
       <Route path="/courses/:id" element={<CourseDetails />} />
       <Route path="/lessons/:id" element={<LessonView />} />
 
-      <Route path="/dashboard" element={<Dashboard />} />
+      {/* Student dashboard */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["STUDENT"]}>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Instructor dashboard */}
+      <Route
+        path="/instructor-dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["INSTRUCTOR"]}>
+            <InstructorDashboard />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/payment-success" element={<PaymentSuccess />} />
 

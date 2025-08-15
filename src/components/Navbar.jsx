@@ -1,5 +1,5 @@
 import React from "react";
-import { HydratedRouter, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
@@ -34,14 +34,17 @@ const Navbar = () => {
               )}
 
               {user.role === "INSTRUCTOR" && (
-                <Link to="/instructor/courses" className="hover:text-blue-600">
-                  My Courses
+                <Link to="/instructor-dashboard" className="hover:text-blue-600">
+                  Instructor Dashboard
                 </Link>
               )}
 
-              <Link to="/dashboard" className="hover:text-blue-600">
-                Dashboard
-              </Link>
+              {user.role === "STUDENT" && (
+                <Link to="/dashboard" className="hover:text-blue-600">
+                  Dashboard
+                </Link>
+              )}
+              
               <button
                 onClick={handleLogout}
                 className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"

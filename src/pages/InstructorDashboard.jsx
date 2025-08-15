@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { getCoursesByInstructor, toggleCoursePublish } from "../services/courseServices";
+import React, { useEffect, useState, useContext } from "react";
+import { getCoursesByInstructor, toggleCoursePublish } from "../services/courseService";
+import { AuthContext } from "../context/AuthContext";
 
 export default function InstructorDashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(null); // ID of the course being updated
+  const [updating, setUpdating] = useState(null);
 
-  // ✅ UPDATED: no need for instructorId from localStorage
-  // const instructorId = localStorage.getItem("instructorId"); 
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    fetchCourses(); // ✅ UPDATED: call fetchCourses directly
-  }, []);
+    fetchCourses();
+  }, [user]);
 
   async function fetchCourses() {
     try {
       setLoading(true);
-      // ✅ UPDATED: getCoursesByInstructor no longer needs an ID param
-      const data = await getCoursesByInstructor();
+      // ✅ Fetch courses using the logged-in user's ID
+      const data = await getCoursesByInstructor(user.id);
       setCourses(data);
     } catch (error) {
       console.error("Error fetching instructor courses:", error);
@@ -29,7 +29,7 @@ export default function InstructorDashboard() {
   async function handleTogglePublish(courseId) {
     try {
       setUpdating(courseId);
-      const updatedCourse = await toggleCoursePublish(courseId); // ✅ UPDATED: call service
+      const updatedCourse = await toggleCoursePublish(courseId); // ✅ call service
 
       // Update state instantly without re-fetching all data
       setCourses((prevCourses) =>
